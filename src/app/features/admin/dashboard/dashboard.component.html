@@ -1,0 +1,37 @@
+<div class="container">
+  <h1>Panel de Administración</h1>
+  
+  <!-- Contenido -->
+  <div class="content">
+    <div class="card">
+      <h3>Estadísticas</h3>
+      <img src="images/estadisticas.png" alt="estadísticas">
+     <!-- ✅ CORRECTO: Botón con RouterLink -->
+<button 
+  [routerLink]="['/admin/Estadisticas']" 
+  class="btn btn-primary">
+  Ver más ▼
+</button>
+
+    </div>
+    
+    <div class="card">
+      <h3>Pedidos</h3>
+      <img src="images/pedidos.png" alt="pedidos">
+      <button routerLink="/admin/ventas/pedidos">Ver más ▼</button>
+    </div>
+    
+    <div class="card">
+      <h3>Productos</h3>
+      <img src="images/pagos.png" alt="pagos">
+      <button routerLink="/admin/mantenimiento/producto">Ver más ▼</button>
+    </div>
+    
+    <div class="card">
+      <h3>Categorias</h3> 
+      <img src="images/reportes.png" alt="reportes">
+      <button routerLink="/admin/mantenimiento/categoria">Ver más ▼</button>
+    </div>
+  </div>
+</div>
+

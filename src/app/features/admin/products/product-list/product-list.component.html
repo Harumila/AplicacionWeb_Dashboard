@@ -1,0 +1,155 @@
+<!-- src/app/features/admin/products/product-list/product-list.component.html -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="m-0">Gestión de Productos</h3>
+
+    <button routerLink="/admin/mantenimiento/products/create" class="btn btn-primary">
+      <i class="fas fa-plus mr-1"></i> Agregar Producto
+    </button>
+  </div>
+
+  <div class="card-body">
+    <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show">
+      {{ successMessage }}
+      <button type="button" class="close" (click)="successMessage = ''">
+        <span>&times;</span>
+      </button>
+    </div>
+
+    <div *ngIf="loadProducts" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Cargando...</span>
+      </div>
+      <p class="mt-2 text-muted">Cargando productos...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !loadProducts" class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle mr-2"></i>
+      {{ errorMessage }}
+      <button class="btn btn-sm btn-outline-danger ml-2" (click)="reloadProducts()">
+        <i class="fas fa-redo mr-1"></i> Reintentar
+      </button>
+    </div>
+
+    <div *ngIf="!loadProducts && !errorMessage">
+      <div class="d-flex justify-content-end mb-3">
+        <div class="input-group input-group-sm" style="width: 280px;">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Buscar productos..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="applySearch()"
+          />
+          <div class="input-group-append">
+            <button class="btn btn-default" (click)="$event.preventDefault()">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive p-0">
+        <table class="table table-hover text-nowrap">
+          <thead>
+            <tr>
+              <th (click)="onSort('id')" style="cursor:pointer;">ID <i [class]="getSortIcon('id')"></i></th>
+              <th (click)="onSort('nombre')" style="cursor:pointer;">Nombre <i [class]="getSortIcon('nombre')"></i></th>
+              <th>Descripción</th>
+              <th (click)="onSort('precio')" style="cursor:pointer;">Precio <i [class]="getSortIcon('precio')"></i></th>
+
+             <th (click)="onSort('categoria')" style="cursor:pointer;">
+  Categoría <i [class]="getSortIcon('categoria')"></i>
+</th>
+
+              
+              
+              <th>Imagen</th>
+              <th style="width:180px;">Acciones</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let product of paginatedProducts; trackBy: trackByProductId">
+              <td>{{ product.id }}</td>
+              <td>{{ product.nombre }}</td>
+              <td class="text-truncate" style="max-width: 320px;" [title]="product.descripcion || ''">
+                {{ product.descripcion || '-' }}
+              </td>
+              <td><strong class="text-success">S/{{ product.precio | number:'1.2-2' }}</strong></td>
+              <td>
+                <span class="badge badge-info">
+                 {{ categoriaNombre(product.categoriaId) }}
+
+                </span>
+              </td>
+              <td>
+                <img
+                  [src]="getImageUrl(product.fotoUrl)"
+                  alt="Imagen del producto"
+                  class="img-thumbnail"
+                  style="width:48px; height:48px; object-fit:cover;"
+                />
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <button class="btn btn-warning btn-sm" title="Editar" (click)="editProduct(product.id)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+
+                  <button class="btn btn-danger btn-sm" title="Eliminar" (click)="openDeleteModal(product)">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="status-toggle-btn"
+                  [class.active]="product.activo"
+                  [attr.aria-pressed]="product.activo"
+                  (click)="toggleProductStatus(product)">
+                  <span class="toggle-track">
+                    <span class="toggle-thumb">
+                      <i class="fas" [ngClass]="product.activo ? 'fa-check' : 'fa-times'"></i>
+                    </span>
+                  </span>
+                  <span class="status-text">{{ product.activo ? 'ACTIVO' : 'INACTIVO' }}</span>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredProducts.length === 0">
+              <td colspan="8" class="text-center py-4 text-muted">
+                No hay productos para mostrar.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="filteredProducts.length > 0" class="card-footer">
+        <div class="d-flex justify-content-between align-items-center">
+          <span>
+            Mostrando {{ getStartIndex() }} a {{ getEndIndex() }} de {{ filteredProducts.length }} productos
+          </span>
+
+          <ul class="pagination m-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="previousPage()" style="cursor:pointer;">Atrás</a>
+            </li>
+
+            <li class="page-item" *ngFor="let p of getVisiblePages()" [class.active]="p === currentPage">
+              <a class="page-link" (click)="goToPage(p)" style="cursor:pointer;">{{ p }}</a>
+            </li>
+
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="nextPage()" style="cursor:pointer;">Siguiente</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

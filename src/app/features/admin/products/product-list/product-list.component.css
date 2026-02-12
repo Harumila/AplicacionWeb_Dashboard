@@ -1,0 +1,189 @@
+.table th {
+  cursor: pointer;
+  &:hover {
+    color: #007bff;
+  }
+}
+
+.img-thumbnail {
+  transition: transform 0.2s;
+  &:hover {
+    transform: scale(1.1);
+  
+  }
+}
+.td-producto {
+  max-width: 260px; /* ajusta según tu tabla */
+}
+
+.td-producto__row{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0; /* clave para que funcione ellipsis en flex */
+}
+
+.td-producto__name{
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+/* badge más compacto */
+.td-producto__badge{
+  font-size: 11px;
+  padding: 2px 6px;
+  white-space: nowrap;
+}
+
+.badge {
+  font-size: 0.8em;
+}
+
+.btn-group .btn {
+  margin-right: 2px;
+}
+
+.badge {
+  color: black !important;
+}
+
+.badge-success {
+  background-color: #28a745;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+}
+
+
+.dataTables_info {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.page-link {
+  cursor: pointer;
+}
+
+
+.modal-img {
+  max-width: 100%;
+  height: auto;
+}
+
+.search-input {
+  transition: all 0.3s;
+  &:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+}
+.main {
+  
+padding: 13px;
+  margin-left: 254px;
+}
+
+.img-producto {
+  width: 56px;       /* Ancho fijo */
+ 
+
+  border-radius: var(--bs-border-radius); 
+ 
+}
+
+
+/* Toggle Estado (ON/OFF) */
+.status-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+
+  user-select: none;
+}
+
+.status-toggle-btn:focus {
+  outline: none;
+}
+
+.toggle-track {
+  position: relative;
+  display: inline-block;
+
+  width: 46px;
+  height: 24px;
+  border-radius: 999px;
+
+  background: #16812b; /* OFF */
+  transition: background-color 180ms ease;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.35);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform: translateX(0);
+  transition: transform 180ms ease;
+}
+
+/* Icono dentro del thumb */
+.toggle-thumb .fas {
+  font-size: 11px;
+  color: #6c757d; /* OFF */
+}
+
+/* Texto ON/OFF */
+.status-text {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  color: #6c757d; /* OFF */
+}
+
+/* ====== ESTADO ACTIVO ====== */
+.status-toggle-btn.active .toggle-track {
+  background: #28a745; /* ON */
+}
+
+.status-toggle-btn.active .toggle-thumb {
+  transform: translateX(22px);
+}
+
+.status-toggle-btn.active .toggle-thumb .fas {
+  color: #28a745;
+}
+
+.status-toggle-btn.active .status-text {
+  color: #28a745;
+}
+
+/* Hover opcional */
+.status-toggle-btn:hover .toggle-track {
+  filter: brightness(1.03);
+}

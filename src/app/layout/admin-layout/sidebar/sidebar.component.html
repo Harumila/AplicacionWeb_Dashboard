@@ -1,0 +1,146 @@
+<aside class="sidebar" [class.sidebar-hidden]="!open">
+ 
+  <div class="sidebar-menu">
+    <div class="sidebar-section">navegacion</div>
+
+    <ng-container *ngFor="let item of menus">
+      <a
+        class="sidebar-link"
+        href="#"
+        data-bs-toggle="collapse"
+        [attr.data-bs-target]="'#' + item.grupo"
+        [attr.aria-controls]="item.grupo"
+        aria-expanded="false"
+      >
+           <!-- Aquí va el SVG dinámico -->
+     <span class="sidebar-icon">
+  <ng-container [ngSwitch]="item.icon">
+    <!-- Dashboard -->
+    <svg *ngSwitchCase="'home'" width="24" height="24" fill="none">
+      <path d="M4 10.75L12 4.5L20 10.75"
+        stroke="#d65a78" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 10.75V18.25C4 18.6642 4.33579 19 4.75 19H8.25V15.5C8.25 15.0858 8.58579 14.75 9 14.75H15C15.4142 14.75 15.75 15.0858 15.75 15.5V19H19.25C19.6642 19 20 18.6642 20 18.25V10.75"
+        stroke="#d65a78" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <!-- Gestión -->
+  <!-- PRODUCTOS (cubo/box) estilo como 'gestion' usando rects -->
+<svg *ngSwitchCase="'gestion'" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <rect x="4" y="8"  width="16" height="10" rx="2" stroke="#000" stroke-width="1.7" fill="none"/>
+  <rect x="7" y="5"  width="10" height="6"  rx="2" stroke="#000" stroke-width="1.1" fill="none"/>
+  <rect x="10" y="10.7" width="4" height="2.6" rx="0.7" fill="#000"/>
+  <rect x="2.5" y="16" width="6" height="5" rx="1.2" fill="none" stroke="#000" stroke-width="1"/>
+  <rect x="15.5" y="16" width="6" height="5" rx="1.2" fill="none" stroke="#000" stroke-width="1"/>
+</svg>
+
+<!-- CATEGORÍAS / LISTA -->
+<svg *ngSwitchCase="'categoria'"
+     xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M13 5h8" />
+  <path d="M13 9h5" />
+  <path d="M13 15h8" />
+  <path d="M13 19h5" />
+  <path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+  <path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
+</svg>
+<!-- PEDIDOS -->
+<svg *ngSwitchCase="'pedidos'"
+     xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M17 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
+  <path d="M17 17h-11v-14h-2" />
+  <path d="M6 5l14 1l-1 7h-13" />
+</svg>
+<!-- DOCUMENTO -->
+<svg *ngSwitchCase="'reportes'"
+     xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24" viewBox="0 0 24 24"
+     fill="none" stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+  <path d="M9 9l1 0" />
+  <path d="M9 13l6 0" />
+  <path d="M9 17l6 0" />
+</svg>
+
+    <!-- Ventas -->
+
+    <!-- Usuarios/Roles -->
+    <svg *ngSwitchCase="'users'" width="24" height="24" fill="none">
+      <circle cx="12" cy="9" r="3.3" stroke="#FCC063" stroke-width="1.7"/>
+      <path d="M5 19c0-3.25 4-5 7-5s7 1.75 7 5" stroke="#FCC063" stroke-width="1.7"/>
+    </svg>
+    <!-- Soporte (auriculares) -->
+    <svg *ngSwitchCase="'support'" width="24" height="24" fill="none">
+      <circle cx="12" cy="12" r="8" stroke="#db7486" stroke-width="1.7"/>
+      <rect x="10" y="10" width="4" height="7" rx="2" fill="#db7486"/>
+      <circle cx="12" cy="7" r="2" fill="#fff" stroke="#db7486" stroke-width="1.7"/>
+    </svg>
+    <!-- Finanzas -->
+    <svg *ngSwitchCase="'money'" width="24" height="24" fill="none">
+      <rect x="5" y="7" width="14" height="10" rx="2" stroke="#6ac87d" stroke-width="2"/>
+      <path d="M12 10v4" stroke="#6ac87d" stroke-width="1.5"/>
+      <circle cx="12" cy="13" r="0.9" fill="#6ac87d"/>
+    </svg>
+    <!-- Admin Shield -->
+    <svg *ngSwitchCase="'shield'" width="24" height="24" fill="none">
+      <path d="M12 3L19 7V13C19 16.87 15.88 19.94 12 21C8.12 19.94 5 16.87 5 13V7L12 3Z"
+        stroke="#b599ff" stroke-width="1.7" fill="#edeafc"/>
+      <path d="M12 3V21" stroke="#b599ff" stroke-width="1.7"/>
+    </svg>
+    <!-- Clientes -->
+    <svg *ngSwitchCase="'clientes'"  width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+  <circle cx="9" cy="7" r="4" />
+  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+</svg>
+  <svg *ngSwitchCase="'pagos'"
+     xmlns="http://www.w3.org/2000/svg"
+     width="24" height="24" viewBox="0 0 24 24">
+  <text x="4" y="17"
+        font-family="Arial, Inter, sans-serif"
+        font-size="16"
+        font-weight="700"
+        fill="#000"
+        xml:space="preserve">S/</text>
+</svg>
+
+    <!-- Default (si hay icon font) -->
+    <i *ngSwitchDefault [class]="item.icon"></i>
+  </ng-container>
+</span>
+
+
+        <span>{{ item.title }}</span>
+        <i class="fas fa-angle-down ms-auto"></i>
+      </a>
+
+      <div
+        class="collapse"
+        [attr.id]="item.grupo"
+        data-bs-parent="#sidenavAccordion"
+      >
+        <nav class="sidebar-submenu">
+          <a
+            class="sidebar-sublink"
+            *ngFor="let submenu of item.children"
+            [routerLink]="submenu.link"
+            routerLinkActive="active"
+          >
+            {{ submenu.title }}
+          </a>
+        </nav>
+      </div>
+    </ng-container>
+  </div>
+</aside>

@@ -1,0 +1,231 @@
+.sidebar {
+  width: 251px;
+  /* ... demás estilos ... */
+  transition: transform 0.3s cubic-bezier(.23,1.07,.65,.99);
+}
+.sidebar.sidebar-hidden {
+  transform: translateX(-100%);
+  pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+.sb-sidenav-menu-heading {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  margin-top: 1rem;
+  color: #adb5bd;
+}
+
+
+.nav-link.active {
+  background-color: #495057;
+  color: white !important;
+}
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  
+  background: linear-gradient(180deg, #2d2d3f 0%, #1c1c2b 100%);
+  color: #fff;
+  overflow-y: auto;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.3);
+  padding-top: 1rem;
+  z-index: 1000;
+}
+
+.nav-link {
+  color: #c2c2d6;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  transition: background 0.3s ease;
+}
+
+.nav-link i {
+  margin-right: 10px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background-color: #444;
+  color: #fff;
+}
+
+.sb-sidenav-menu-heading {
+  padding: 10px 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+
+
+.sidebar-menu {
+  flex-grow: 1;
+  padding: 15px;
+}
+
+.sidebar-section {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #999;
+  margin-bottom: 10px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  color: white;
+  text-decoration: none;
+  transition: background 0.3s;
+  border-radius: 6px;
+  cursor: pointer;
+
+  i {
+    margin-right: 10px;
+    font-size: 1rem;
+  }
+
+  &:hover {
+    background-color: #2d2d44;
+  }
+
+  &.active {
+    background-color: #3f51b5;
+  }
+}
+
+.sidebar-submenu {
+  display: flex;
+  flex-direction: column;
+  padding-left: 20px;
+  margin-top: 5px;
+}
+
+.sidebar-sublink {
+  color: #ccc;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover,
+  &.active {
+    color: white;
+    background-color: #3f51b5;
+  }
+  
+}
+.main-content {
+  margin-left: 250px; 
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 245px;
+  height: 100vh;
+  position: fixed;
+
+  left: 0;
+  background: #fff;
+  color: #262940;
+  font-family: 'Inter', Arial, sans-serif;
+  box-shadow: 2px 0 14px #163d5a10;
+  padding-top: 24px;
+  z-index: 1000;
+  border-top-right-radius: 18px;
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-section {
+  font-size: 1.rem;
+  font-weight: 500;
+  color: #16162a;
+  padding: 15px 0 9px 24px;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 7px 18px 7px 26px;
+  color: #242639;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 1.09rem;
+  font-weight: 500;
+  gap: 13px;
+  margin-bottom: 3px;
+  transition: background 0.18s, color 0.17s;
+  position: relative;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background-color: #e16aaf6b !important;
+  font-weight: 600;
+  color: #222;
+}
+
+.sidebar-link .ms-auto {
+  margin-left: auto;
+  color: #e84d4d;
+  font-size: 1.18em;
+  padding-right: 3px;
+}
+
+.sidebar-link i:not(.ms-auto) {
+  font-size: 1.07rem;
+  margin-right: 9px;
+  min-width: 26px;
+  text-align: center;
+  /* Ejemplo de color personalizado por icono/fa:
+     Puedes usar ngClass/ngStyle para más variantes */
+}
+
+.sidebar-submenu {
+  flex-direction: column;
+  padding-left: 32px;
+  margin-top: 5px;
+  border-left: 2px solid #e5e8ee;
+}
+
+.sidebar-sublink {
+  color: #9caec9;
+  padding: 7px 10px;
+  font-size: 0.98rem;
+  border-radius: 4px;
+  text-decoration: none;
+  margin-bottom: 2px;
+  font-weight: 400;
+  transition: background 0.16s, color 0.13s;
+}
+.sidebar-sublink:hover,
+.sidebar-sublink.active {
+  background-color: #f4f6fa;
+  color: #272939;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: #ececec;
+  border-radius: 6px;
+}

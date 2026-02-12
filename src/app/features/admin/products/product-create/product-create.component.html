@@ -1,0 +1,115 @@
+<!-- src/app/features/admin/products/product-create/product-create.component.html -->
+
+<!-- éxito sobrepuesto -->
+<div class="alert alert-success alert-custom fixed-top-center" *ngIf="mensajeExito">
+  <i class="fas fa-check-circle me-2"></i>
+  {{ mensajeExito }}
+</div>
+
+<div class="min-vh-100 bg-light py-5">
+  <div class="container px-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+
+        <div class="mb-4">
+          <h1 class="fw-bold mb-1">Crear Nuevo Producto</h1>
+          <p class="text-muted m-0">Completa la información del producto</p>
+        </div>
+
+        <!-- error normal -->
+        <div class="alert alert-danger mb-4" *ngIf="mensajeError">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          {{ mensajeError }}
+        </div>
+
+        <div class="card shadow-sm mb-5">
+          <div class="card-body p-4 p-md-5">
+
+            <form [formGroup]="productoForm" (ngSubmit)="submit()">
+
+              <div class="row g-3">
+               <!-- CategoriaId -->
+<div class="col-md-6">
+  <label class="form-label">Categoría <span class="text-danger">*</span></label>
+
+  <select class="form-control" formControlName="categoriaId" [disabled]="loadingCategorias">
+    <option [ngValue]="null" disabled>
+      {{ loadingCategorias ? 'Cargando categorías...' : 'Selecciona una categoría' }}
+    </option>
+
+    <option *ngFor="let c of categorias" [ngValue]="c.id">
+      {{ c.nombre }}
+    </option>
+  </select>
+
+  <div class="text-danger small mt-1"
+       *ngIf="productoForm.get('categoriaId')?.touched && productoForm.get('categoriaId')?.invalid">
+    Categoría requerida
+  </div>
+</div>
+
+                <!-- Activo -->
+                <div class="col-md-6">
+                  <label class="form-label">Activo</label>
+                  <select class="form-control" formControlName="activo">
+                    <option [ngValue]="true">Sí</option>
+                    <option [ngValue]="false">No</option>
+                  </select>
+                </div>
+
+                <!-- Nombre -->
+                <div class="col-12">
+                  <label class="form-label">Nombre <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del producto">
+                  <div class="text-danger small mt-1" *ngIf="productoForm.get('nombre')?.touched && productoForm.get('nombre')?.invalid">
+                    Nombre requerido
+                  </div>
+                </div>
+
+                <!-- Descripcion -->
+                <div class="col-12">
+                  <label class="form-label">Descripción</label>
+                  <textarea rows="3" class="form-control" formControlName="descripcion" placeholder="Descripción"></textarea>
+                </div>
+
+                <!-- Precio -->
+                <div class="col-md-6">
+                  <label class="form-label">Precio <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text">S/</span>
+                    <input type="number" class="form-control" formControlName="precio" step="0.01" placeholder="0.00">
+                  </div>
+                </div>
+
+                <!-- Foto -->
+                <div class="col-md-6">
+                  <label class="form-label">Foto <span class="text-danger">*</span></label>
+                  <input type="file" class="form-control" (change)="onFotoSelected($event)" accept="image/*">
+
+                  <div *ngIf="fotoPreview" class="mt-2">
+                    <img [src]="fotoPreview" class="img-thumbnail" style="max-height: 150px;">
+                    <small class="d-block text-muted">Nueva imagen seleccionada</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" [disabled]="isLoading"
+                        (click)="cancel()">
+                  Cancelar
+                </button>
+
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                  {{ isLoading ? 'Guardando...' : 'Crear Producto' }}
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

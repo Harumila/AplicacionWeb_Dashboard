@@ -1,0 +1,427 @@
+<!-- src/app/features/admin/envios/envios.component.html -->
+
+<main class="main">
+  <div class="container-fluid">
+    <div class="row mb-4">
+      <div class="col-12">
+        <h1 class="h3 mb-0">
+          <i class="fas fa-shipping-fast text-primary me-2"></i>
+          Gestión de Envíos
+        </h1>
+        <p class="text-muted">Administra el seguimiento y documentos de los envíos de NTX</p>
+      </div>
+    </div>
+
+    <!-- Búsqueda de envío -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-search me-2"></i>
+              Buscar Envío
+            </h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="busquedaForm" (ngSubmit)="buscarEnvio()">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-hashtag"></i>
+                </span>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  formControlName="ventaId"
+                  placeholder="Ingrese ID de venta (Ej: 231)"
+                  required>
+                <button 
+                  class="btn btn-primary" 
+                  type="submit"
+                  [disabled]="busquedaForm.invalid || cargando">
+                  <i class="fas fa-search" *ngIf="!cargando"></i>
+                  <span class="spinner-border spinner-border-sm" *ngIf="cargando"></span>
+                  {{ cargando ? 'Buscando...' : 'Buscar' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estados disponibles -->
+    <div class="row mb-4" *ngIf="estados.length > 0">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-tasks me-2"></i>
+              Estados de Envío NTX
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-4 col-lg-2" *ngFor="let estado of estados">
+                <div 
+                  class="card text-center h-100 border-0 shadow-sm"
+                  [style.border-left]="'4px solid ' + getEstadoColor(estado.id) + ' !important'">
+                  <div class="card-body p-3">
+                    <div 
+                      class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                      [style.background-color]="getEstadoColor(estado.id)"
+                      style="width: 50px; height: 50px;">
+                      <i [class]="getEstadoIcono(estado.id)" class="text-white fa-lg"></i>
+                    </div>
+                    <h6 class="mb-1" [style.color]="getEstadoColor(estado.id)">
+                      {{ estado.nombre }}
+                    </h6>
+                    <small class="text-muted">{{ estado.descripcion }}</small>
+                    
+                    <!-- Barra de progreso -->
+                    <div class="progress mt-2" style="height: 4px;">
+                      <div 
+                        class="progress-bar" 
+                        [style.width.%]="getProgresoEstado(estado.id)"
+                        [style.background-color]="getEstadoColor(estado.id)">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del envío -->
+   <div class="row" *ngIf="ventaSeleccionada !== null">
+
+      <!-- Seguimiento actual -->
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-route me-2"></i>
+              Seguimiento - Venta #{{ ventaSeleccionada }}
+            </h5>
+          </div>
+          <div class="card-body">
+            <div *ngIf="seguimientos.length === 0" class="text-center text-muted py-4">
+              <i class="fas fa-inbox fa-3x mb-3 opacity-50"></i>
+              <p>No hay seguimientos registrados</p>
+              <small>Agrega el primer estado de este envío →</small>
+            </div>
+            
+            <!-- Timeline de seguimientos -->
+            <div class="position-relative" *ngIf="seguimientos.length > 0">
+              <div 
+                *ngFor="let seguimiento of seguimientos; let i = index; let last = last" 
+                class="d-flex mb-4 position-relative">
+                
+                <!-- Línea vertical de conexión -->
+                <div 
+                  *ngIf="!last"
+                  class="position-absolute"
+                  [style.background-color]="getEstadoColor(seguimiento.estado_id)"
+                  style="left: 24px; top: 50px; width: 2px; height: calc(100% + 16px); opacity: 0.3;">
+                </div>
+                
+                <!-- Icono del estado -->
+                <div class="flex-shrink-0 me-3 position-relative" style="z-index: 1;">
+                  <div 
+                    class="rounded-circle d-flex align-items-center justify-content-center shadow"
+                    [style.background-color]="getEstadoColor(seguimiento.estado_id)"
+                    style="width: 50px; height: 50px; color: white;">
+                    <i [class]="getEstadoIcono(seguimiento.estado_id)"></i>
+                  </div>
+                </div>
+                
+                <!-- Contenido del seguimiento -->
+                <div class="flex-grow-1">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                      <h6 class="mb-1" [style.color]="getEstadoColor(seguimiento.estado_id)">
+                        {{ seguimiento.estado_nombre }}
+                      </h6>
+                      <p class="text-muted small mb-2">{{ seguimiento.estado_descripcion }}</p>
+                      
+                      <div class="mb-1">
+                        <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                        <strong>Ubicación:</strong> {{ seguimiento.ubicacion_actual }}
+                      </div>
+                      
+                      <div class="mb-2" *ngIf="seguimiento.observaciones">
+                        <i class="fas fa-comment-alt text-info me-1"></i>
+                        <strong>Observaciones:</strong> 
+                        <span class="text-muted">{{ seguimiento.observaciones }}</span>
+                      </div>
+                      
+                      <small class="text-muted">
+                        <i class="fas fa-clock me-1"></i>
+                        {{ seguimiento.fecha_cambio | date:'dd/MM/yyyy HH:mm' }}
+                      </small>
+                      
+                      <!-- Badge de confirmación (si aplica) -->
+                      <div *ngIf="seguimiento.confirmado_por_cliente" class="mt-2">
+                        <span class="badge bg-success">
+                          <i class="fas fa-check"></i> Confirmado por cliente
+                        </span>
+                      </div>
+                      
+                      <!-- Barra de progreso individual -->
+                      <div class="progress mt-2" style="height: 5px;">
+                        <div 
+                          class="progress-bar" 
+                          [style.width.%]="getProgresoEstado(seguimiento.estado_id)"
+                          [style.background-color]="getEstadoColor(seguimiento.estado_id)">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agregar nuevo seguimiento -->
+      <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-plus-circle me-2"></i>
+              Actualizar Estado de Envío
+            </h5>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="seguimientoForm" (ngSubmit)="agregarSeguimiento()">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-list me-1"></i>
+                  Nuevo Estado <span class="text-danger">*</span>
+                </label>
+                
+                <!-- ✅ NUEVO: Alertas de validación -->
+                <div *ngIf="estadosDisponibles.length === 0 && seguimientos.length > 0 && !procesoCompletado()" 
+                     class="alert alert-warning mb-2">
+                  <i class="fas fa-exclamation-triangle me-2"></i>
+                  <strong>No hay estados disponibles.</strong> Todos los estados ya fueron registrados.
+                </div>
+
+                <div *ngIf="procesoCompletado()" class="alert alert-success mb-2">
+                  <i class="fas fa-check-circle me-2"></i>
+                  <strong>Proceso completado:</strong> El pedido fue enviado a la agencia de transporte.
+                </div>
+                
+                <!-- ✅ ACTUALIZADO: Select con estados filtrados -->
+                <select 
+                  class="form-select form-select-lg" 
+                  formControlName="estado_id" 
+                  [disabled]="estadosDisponibles.length === 0 || procesoCompletado()"
+                  required>
+                  <option value="">
+                    {{ estadosDisponibles.length === 0 ? 'No hay estados disponibles' : 'Seleccione un estado...' }}
+                  </option>
+                  <!-- ✅ CAMBIADO: Usar estadosDisponibles en lugar de estados -->
+                  <option *ngFor="let estado of estadosDisponibles" [value]="estado.id">
+                    {{ estado.nombre }} - {{ estado.descripcion }}
+                  </option>
+                </select>
+                
+                <!-- Preview del estado seleccionado -->
+                <div 
+                  *ngIf="seguimientoForm.get('estado_id')?.value"
+                  class="alert alert-light mt-2 mb-0 d-flex align-items-center">
+                  <div 
+                    class="rounded-circle me-2 d-flex align-items-center justify-content-center"
+                    [style.background-color]="getEstadoColor(+seguimientoForm.get('estado_id')!.value)"
+                    style="width: 30px; height: 30px; min-width: 30px;">
+                    <i [class]="getEstadoIcono(+seguimientoForm.get('estado_id')!.value)" class="text-white small"></i>
+                  </div>
+                  <small class="text-muted">
+                    El cliente será notificado por push notification
+                  </small>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-map-marker-alt me-1"></i>
+                  Ubicación Actual <span class="text-danger">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  class="form-control form-control-lg" 
+                  formControlName="ubicacion_actual"
+                  placeholder="Ej: Oficina NTX - Lima Centro"
+                  required>
+                <small class="text-muted">Ubicación física actual del pedido</small>
+              </div>
+              
+              <div class="mb-3">
+                <label class="form-label fw-semibold">
+                  <i class="fas fa-comment-dots me-1"></i>
+                  Observaciones <span class="text-muted">(opcional)</span>
+                </label>
+                <textarea 
+                  class="form-control" 
+                  formControlName="observaciones"
+                  rows="3"
+                  placeholder="Ej: Pedido empaquetado y listo para ser enviado a la agencia de transporte..."></textarea>
+                <small class="text-muted">Esta información será visible para el cliente</small>
+              </div>
+              
+              <div class="d-grid">
+                <button 
+                  type="submit" 
+                  class="btn btn-success btn-lg"
+                  [disabled]="seguimientoForm.invalid || enviandoSeguimiento || estadosDisponibles.length === 0 || procesoCompletado()">
+                  <i class="fas fa-paper-plane" *ngIf="!enviandoSeguimiento"></i>
+                  <span class="spinner-border spinner-border-sm" *ngIf="enviandoSeguimiento"></span>
+                  {{ enviandoSeguimiento ? 'Actualizando y Notificando...' : 'Actualizar y Notificar Cliente' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Documentos -->
+      <div class="col-12 mb-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-file-alt me-2"></i>
+              Documentos de Envío
+            </h5>
+            <button 
+              class="btn btn-light btn-sm" 
+              type="button"
+              data-bs-toggle="collapse" 
+              data-bs-target="#subirDocumento">
+              <i class="fas fa-plus"></i> Subir Documento
+            </button>
+          </div>
+          
+          <!-- Formulario para subir documento -->
+          <div class="collapse" id="subirDocumento">
+            <div class="card-body border-bottom bg-light">
+              <form [formGroup]="documentoForm" (ngSubmit)="subirDocumento()">
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Tipo de Documento</label>
+                    <select class="form-select" formControlName="tipo_documento" required>
+                      <option value="">Seleccionar tipo</option>
+                      <option value="boleta">📄 Boleta</option>
+                      <option value="foto_envio">📸 Foto del Envío</option>
+                      <option value="guia_remision">🚚 Guía de Remisión</option>
+                      <option value="comprobante_entrega">✅ Comprobante de Entrega</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-semibold">Archivo (Max 5MB)</label>
+                    <input 
+                      type="file" 
+                      class="form-control" 
+                      (change)="onArchivoSeleccionado($event)"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required>
+                    <small class="text-muted">PDF, JPG, PNG</small>
+                  </div>
+                  
+                  <div class="col-md-4 mb-3 d-flex align-items-end">
+                    <button 
+                      type="submit" 
+                      class="btn btn-success w-100"
+                      [disabled]="documentoForm.invalid || !archivoSeleccionado || subiendoDocumento">
+                      <i class="fas fa-upload" *ngIf="!subiendoDocumento"></i>
+                      <span class="spinner-border spinner-border-sm" *ngIf="subiendoDocumento"></span>
+                      {{ subiendoDocumento ? 'Subiendo...' : 'Subir Documento' }}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          
+          <!-- Lista de documentos -->
+          <div class="card-body">
+            <div *ngIf="documentos.length === 0" class="text-center text-muted py-4">
+              <i class="fas fa-folder-open fa-3x mb-3 opacity-50"></i>
+              <p>No hay documentos registrados</p>
+            </div>
+            
+            <div class="table-responsive" *ngIf="documentos.length > 0">
+              <table class="table table-hover align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th>
+                      <i class="fas fa-file me-1"></i>
+                      Tipo
+                    </th>
+                    <th>
+                      <i class="fas fa-paperclip me-1"></i>
+                      Archivo
+                    </th>
+                    <th>
+                      <i class="fas fa-calendar me-1"></i>
+                      Fecha
+                    </th>
+                    <th class="text-center">
+                      <i class="fas fa-cog me-1"></i>
+                      Acciones
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let documento of documentos">
+                    <td>
+                      <span class="badge bg-secondary">
+                        {{ getTipoDocumentoLabel(documento.tipo_documento) }}
+                      </span>
+                    </td>
+                    <td>
+                      <i class="fas fa-file-alt text-muted me-1"></i>
+                      {{ documento.nombre_archivo }}
+                    </td>
+                    <td>{{ documento.fecha_subida | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="text-center">
+                      <button 
+                        class="btn btn-outline-primary btn-sm"
+                        (click)="descargarDocumento(documento)">
+                        <i class="fas fa-eye"></i> Ver
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alertas -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+      <div 
+        *ngIf="mensaje"
+        class="alert alert-dismissible fade show shadow-lg" 
+        [class.alert-success]="tipoMensaje === 'success'"
+        [class.alert-danger]="tipoMensaje === 'error'"
+        [class.alert-warning]="tipoMensaje === 'warning'"
+        role="alert">
+        <i 
+          class="fas me-2"
+          [class.fa-check-circle]="tipoMensaje === 'success'"
+          [class.fa-exclamation-circle]="tipoMensaje === 'error'"
+          [class.fa-exclamation-triangle]="tipoMensaje === 'warning'">
+        </i>
+        {{ mensaje }}
+        <button type="button" class="btn-close" (click)="cerrarMensaje()"></button>
+      </div>
+    </div>
+  </div>
+</main>

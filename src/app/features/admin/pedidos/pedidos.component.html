@@ -1,0 +1,646 @@
+<!-- pedidos.component.html -->
+<div class="pedidos container-fluid py-3">
+  <!-- Header -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+      <h2 class="mb-1 pedidos-title">Pedidos (Admin)</h2>
+      <div class="text-muted small">Gestion de ordenes y validacion de vouchers (Yape)</div>
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-brand btn-sm"
+        (click)="loadOrdenes()"
+        [disabled]="isLoading"
+      >
+        <span class="me-1" aria-hidden="true">↻</span>
+        Recargar
+      </button>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  <div *ngIf="mensajeError" class="alert alert-danger d-flex align-items-start gap-2 shadow-sm" role="alert">
+    <span class="alert-ico" aria-hidden="true">X</span>
+    <div class="flex-grow-1">
+      <div class="fw-semibold">Ocurrio un problema</div>
+      <div class="small">{{ mensajeError }}</div>
+    </div>
+  </div>
+
+  <div *ngIf="mensajeExito" class="alert alert-success d-flex align-items-start gap-2 shadow-sm" role="alert">
+    <span class="alert-ico" aria-hidden="true">OK</span>
+    <div class="flex-grow-1">
+      <div class="fw-semibold">Accion completada</div>
+      <div class="small">{{ mensajeExito }}</div>
+    </div>
+  </div>
+
+  <!-- Pagos en revision -->
+  <section class="card pedidos-card pedidos-card--review mb-3" *ngIf="pagosEnRevision.length > 0">
+    <div class="card-header pedidos-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="chip chip-review">En revision</span>
+        <h3 class="h6 mb-0">
+          Pagos pendientes de validacion
+          <span class="text-muted">({{ pagosEnRevision.length }})</span>
+        </h3>
+      </div>
+      <div class="small text-muted">Prioriza esta lista para mantener la operacion al dia</div>
+    </div>
+
+    <div class="card-body pt-0">
+      <div class="table-responsive table-scroll table-scroll--review mt-3">
+        <table class="table table-hover align-middle mb-0 pedidos-table table-sticky">
+          <thead>
+            <tr>
+              <th class="text-nowrap">Orden</th>
+              <th class="text-nowrap">Usuario</th>
+              <th class="text-nowrap">Monto</th>
+              <th class="text-nowrap">Nro. Operacion</th>
+              <th class="text-nowrap text-end">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let p of pagosEnRevision" class="row-review">
+              <td class="fw-semibold text-nowrap">#{{ p.id }}</td>
+              <td class="text-nowrap">{{ p.usuarioId }}</td>
+              <td class="text-nowrap">{{ p.totalAmount | number:'1.2-2' }}</td>
+              <td class="text-nowrap">{{ p.nroOperacion || '—' }}</td>
+
+              <td class="text-end">
+                <div class="d-inline-flex flex-wrap gap-2 justify-content-end">
+                  <button
+                    type="button"
+                    class="btn btn-success btn-sm"
+                    (click)="validarPago(p.pagoId!, 'CONFIRMADO')"
+                    [disabled]="isLoading || isLoadingDetalle"
+                    title="Confirmar pago"
+                  >
+                    Confirmar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="validarPago(p.pagoId!, 'RECHAZADO')"
+                    [disabled]="isLoading || isLoadingDetalle"
+                    title="Rechazar pago"
+                  >
+                    Rechazar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-brand btn-sm"
+                    (click)="verDetalle(p)"
+                    [disabled]="isLoadingDetalle"
+                    title="Abrir detalle"
+                  >
+                    Ver detalle
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="pagosEnRevision.length === 0">
+              <td colspan="5" class="text-center text-muted py-4">No hay pagos en revision.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ordenes -->
+  <section class="card pedidos-card mb-3">
+    <div class="card-header pedidos-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <h3 class="h6 mb-0">Ordenes</h3>
+        <span class="text-muted small">({{ ordenes.length }})</span>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <span *ngIf="isLoading" class="text-muted small">Actualizando...</span>
+        <button
+          type="button"
+          class="btn btn-outline-brand btn-sm"
+          (click)="loadOrdenes()"
+          [disabled]="isLoading"
+        >
+          ↻ Recargar
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading skeleton -->
+    <div *ngIf="isLoading" class="card-body">
+      <div class="skeleton-wrap">
+        <div class="skeleton-line w-25 mb-2"></div>
+        <div class="skeleton-line w-50 mb-4"></div>
+
+        <div class="skeleton-table">
+          <div class="skeleton-row" *ngFor="let _ of [1,2,3,4,5,6,7]">
+            <div class="skeleton-cell w-10"></div>
+            <div class="skeleton-cell w-12"></div>
+            <div class="skeleton-cell w-14"></div>
+            <div class="skeleton-cell w-10"></div>
+            <div class="skeleton-cell w-16"></div>
+            <div class="skeleton-cell w-12"></div>
+            <div class="skeleton-cell w-8"></div>
+            <div class="skeleton-cell w-10"></div>
+            <div class="skeleton-cell w-14"></div>
+            <div class="skeleton-cell w-10"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading" class="card-body pt-0">
+      <div class="table-responsive table-scroll mt-3">
+        <table class="table table-hover align-middle mb-0 pedidos-table table-sticky">
+          <thead>
+            <tr>
+              <th class="text-nowrap">ID</th>
+              <th class="text-nowrap">Usuario</th>
+              <th class="text-nowrap">Pickup</th>
+              <th class="text-nowrap">Total</th>
+              <th class="text-nowrap">Estado</th>
+              <th class="text-nowrap">Pago</th>
+              <th class="text-nowrap">#Items</th>
+              <th class="text-nowrap">Cant. Total</th>
+              <th class="text-nowrap">Creada</th>
+              <th class="text-nowrap text-end">Accion</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="let o of ordenes"
+              [class.table-warning]="o.pagoEstado === 'EN_REVISION'"
+              [class.table-danger-subtle]="o.pagoEstado === 'RECHAZADO'"
+            >
+              <td class="fw-semibold text-nowrap">#{{ o.id }}</td>
+              <td class="text-nowrap">{{ o.usuarioId }}</td>
+              <td class="text-nowrap">{{ o.pickupAt | date:'yyyy-MM-dd HH:mm' }}</td>
+              <td class="text-nowrap">{{ o.totalAmount | number:'1.2-2' }}</td>
+
+              <td class="text-nowrap">
+                <span *ngIf="o.estadoCodigo === 'CREADA'" class="badge text-bg-secondary me-2">CREADA</span>
+                <span *ngIf="o.estadoCodigo === 'PENDIENTE'" class="badge text-bg-warning text-dark me-2">PENDIENTE</span>
+                <span *ngIf="o.estadoCodigo === 'PREPARANDO'" class="badge text-bg-info text-dark me-2">PREPARANDO</span>
+                <span *ngIf="o.estadoCodigo === 'LISTO'" class="badge text-bg-primary me-2">LISTO</span>
+                <span *ngIf="o.estadoCodigo === 'ENTREGADO'" class="badge text-bg-success me-2">ENTREGADO</span>
+                <span *ngIf="o.estadoCodigo === 'CANCELADA'" class="badge text-bg-danger me-2">CANCELADA</span>
+                <span *ngIf="!o.estadoCodigo" class="badge text-bg-light text-dark me-2">—</span>
+
+                <span class="text-muted small d-none d-lg-inline">
+                  {{ o.estadoNombre || '—' }}
+                </span>
+              </td>
+
+              <td class="text-nowrap">
+                <span *ngIf="!o.pagoId" class="badge text-bg-light text-dark">Sin pago</span>
+
+                <span *ngIf="o.pagoEstado === 'PENDIENTE'" class="badge text-bg-warning text-dark">Pendiente</span>
+                <span *ngIf="o.pagoEstado === 'CONFIRMADO'" class="badge text-bg-success">Confirmado</span>
+                <span *ngIf="o.pagoEstado === 'RECHAZADO'" class="badge text-bg-danger">Rechazado</span>
+                <span *ngIf="o.pagoEstado === 'EN_REVISION'" class="badge badge-review">En revision</span>
+              </td>
+
+              <td class="text-nowrap">{{ o.itemsCount }}</td>
+              <td class="text-nowrap">{{ o.itemsCantidadTotal }}</td>
+              <td class="text-nowrap">{{ o.createdAt | date:'yyyy-MM-dd HH:mm' }}</td>
+
+              <td class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-brand btn-sm"
+                  (click)="verDetalle(o)"
+                  [disabled]="isLoadingDetalle"
+                >
+                  Ver detalle
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="ordenes.length === 0">
+              <td colspan="10" class="text-center text-muted py-4">No hay ordenes.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="small text-muted mt-2">
+        Tip: en movil puedes desplazarte horizontalmente para ver todas las columnas.
+      </div>
+    </div>
+  </section>
+
+  <!-- Detalle -->
+  <section class="card pedidos-card mb-3" *ngIf="selectedOrden as d">
+    <div class="card-header pedidos-card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <h3 class="h6 mb-0">Detalle orden <span class="text-muted">#{{ d.id }}</span></h3>
+        <span *ngIf="d.pagoEstado === 'EN_REVISION'" class="chip chip-review">Pago en revision</span>
+        <span *ngIf="d.pagoEstado === 'RECHAZADO'" class="chip chip-rejected">Pago rechazado</span>
+      </div>
+
+      <div class="text-muted small">
+        Usuario: <span class="fw-semibold">{{ d.usuarioId }}</span>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <!-- Loading detalle -->
+      <div *ngIf="isLoadingDetalle" class="skeleton-wrap">
+        <div class="skeleton-line w-50 mb-2"></div>
+        <div class="skeleton-line w-75 mb-4"></div>
+        <div class="row g-3">
+          <div class="col-12 col-lg-5">
+            <div class="skeleton-card">
+              <div class="skeleton-line w-60 mb-2"></div>
+              <div class="skeleton-line w-80 mb-2"></div>
+              <div class="skeleton-line w-70 mb-2"></div>
+              <div class="skeleton-line w-65"></div>
+            </div>
+          </div>
+          <div class="col-12 col-lg-7">
+            <div class="skeleton-card">
+              <div class="skeleton-line w-40 mb-3"></div>
+              <div class="skeleton-row" *ngFor="let _ of [1,2,3,4]">
+                <div class="skeleton-cell w-35"></div>
+                <div class="skeleton-cell w-15"></div>
+                <div class="skeleton-cell w-20"></div>
+                <div class="skeleton-cell w-20"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenido detalle -->
+      <div *ngIf="!isLoadingDetalle" class="row g-3">
+        <!-- Bloqueo por pago rechazado -->
+        <div class="col-12" *ngIf="d.pagoEstado === 'RECHAZADO'">
+          <div class="alert alert-danger d-flex align-items-start gap-2" role="alert">
+            <span class="alert-ico" aria-hidden="true">!</span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold">Orden bloqueada</div>
+              <div class="small">Esta orden tiene el pago rechazado. No se puede modificar el estado ni realizar mas acciones hasta que se resuelva el problema de pago.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="col-12 col-lg-5">
+          <div class="card pedidos-subcard h-100">
+            <div class="card-body">
+              <h4 class="h6 mb-3">Informacion</h4>
+
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">Usuario</div>
+                  <div class="info-value">{{ d.usuarioId }}</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Pickup</div>
+                  <div class="info-value">{{ d.pickupAt | date:'yyyy-MM-dd HH:mm' }}</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Total</div>
+                  <div class="info-value">{{ d.totalAmount | number:'1.2-2' }}</div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Estado</div>
+                  <div class="info-value">
+                    <span class="badge text-bg-light text-dark me-2">{{ d.estadoCodigo || '—' }}</span>
+                    <span class="text-muted small">{{ d.estadoNombre || '—' }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <div class="info-label">Creada</div>
+                  <div class="info-value">{{ d.createdAt | date:'yyyy-MM-dd HH:mm' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="col-12 col-lg-7">
+          <div class="card pedidos-subcard h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                <h4 class="h6 mb-0">Items</h4>
+               <span class="text-muted small">{{ d?.items?.length || 0 }} item(s)</span>
+              </div>
+
+              <div class="table-responsive table-scroll table-scroll--inner">
+                <table class="table table-sm table-hover align-middle mb-0 pedidos-table table-sticky">
+                  <thead>
+                    <tr>
+                      <th class="text-nowrap">Producto</th>
+                      <th class="text-nowrap text-end">Cant.</th>
+                      <th class="text-nowrap text-end">Precio</th>
+                      <th class="text-nowrap text-end">Subtotal</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let it of d.items">
+                      <td class="text-nowrap">{{ it.nombre }}</td>
+                      <td class="text-end">{{ it.cantidad }}</td>
+                      <td class="text-end">{{ it.precioUnitario | number:'1.2-2' }}</td>
+                      <td class="text-end fw-semibold">{{ it.subtotal | number:'1.2-2' }}</td>
+                    </tr>
+
+                   <tr *ngIf="d.items?.length === 0">
+                      <td colspan="4" class="text-center text-muted py-3">Sin items.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="small text-muted mt-2">
+                Tip: revisa cantidades y subtotales antes de confirmar el pago.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pago + voucher -->
+        <div class="col-12" *ngIf="d.pagoId">
+          <div class="card pedidos-subcard">
+            <div class="card-body">
+              <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+                <div>
+                  <h4 class="h6 mb-1">Informacion de Pago</h4>
+                  <div class="text-muted small">Validacion manual del voucher (Yape)</div>
+                </div>
+
+                <div>
+                  <span *ngIf="d.pagoEstado === 'PENDIENTE'" class="badge text-bg-warning text-dark">Pendiente</span>
+                  <span *ngIf="d.pagoEstado === 'EN_REVISION'" class="badge badge-review">En revision</span>
+                  <span *ngIf="d.pagoEstado === 'CONFIRMADO'" class="badge text-bg-success">Confirmado</span>
+                  <span *ngIf="d.pagoEstado === 'RECHAZADO'" class="badge text-bg-danger">Rechazado</span>
+                </div>
+              </div>
+
+              <div class="row g-3">
+                <div class="col-12 col-lg-5">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <div class="info-label">Nro. Operacion</div>
+                      <div class="info-value">{{ d.nroOperacion || '—' }}</div>
+                    </div>
+
+                    <div class="info-item">
+                      <div class="info-label">Fecha pago</div>
+                      <div class="info-value">{{ d.paidAt ? (d.paidAt | date:'yyyy-MM-dd HH:mm') : '—' }}</div>
+                    </div>
+                  </div>
+
+                  <!-- Validacion (solo EN_REVISION) -->
+                  <div *ngIf="d.pagoEstado === 'EN_REVISION'" class="review-box mt-3">
+                    <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                      <h5 class="h6 mb-0">Validar pago</h5>
+                      <span class="small text-muted">Accion requerida</span>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        class="btn btn-success"
+                        (click)="validarPago(d.pagoId!, 'CONFIRMADO')"
+                        [disabled]="isLoading || isLoadingDetalle"
+                      >
+                        Confirmar pago
+                      </button>
+
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger"
+                        (click)="validarPago(d.pagoId!, 'RECHAZADO')"
+                        [disabled]="isLoading || isLoadingDetalle"
+                      >
+                        Rechazar pago
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Voucher preview + zoom -->
+                <div class="col-12 col-lg-7">
+                  <div class="voucher-card">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                      <div class="fw-semibold">Voucher enviado</div>
+
+                      <div class="d-flex gap-2">
+                        <label
+                          *ngIf="d.voucherImagenUrl"
+                          class="btn btn-outline-secondary btn-sm"
+                          for="voucherPreviewToggle"
+                          title="Vista grande"
+                        >
+                          Ver grande
+                        </label>
+
+                        <a
+                          *ngIf="d.voucherImagenUrl"
+                          class="btn btn-outline-brand btn-sm"
+                          [href]="'https://harumi-otaku-backend-net.onrender.com' + d.voucherImagenUrl"
+                          target="_blank"
+                          rel="noopener"
+                          title="Abrir en una pestana"
+                        >
+                          Abrir
+                        </a>
+                      </div>
+                    </div>
+
+                    <div *ngIf="!d.voucherImagenUrl" class="voucher-fallback">
+                      <div class="voucher-fallback-ico" aria-hidden="true">?</div>
+                      <div class="fw-semibold">No se adjunto voucher</div>
+                      <div class="text-muted small">El cliente aun no envia imagen o no esta disponible.</div>
+                    </div>
+
+                    <div *ngIf="d.voucherImagenUrl" class="voucher-preview">
+                      <!-- Toggle CSS-only -->
+                      <input id="voucherPreviewToggle" class="voucher-toggle" type="checkbox" />
+
+                      <!-- Mini preview (clicable) -->
+                      <label class="voucher-mini" for="voucherPreviewToggle">
+                        <img
+                          class="voucher-img"
+                          [src]="'https://harumi-otaku-backend-net.onrender.com' + d.voucherImagenUrl"
+                          alt="Voucher Yape"
+                          loading="lazy"
+                        />
+                        <span class="voucher-mini-hint">Toca/clic para ampliar</span>
+                      </label>
+
+                      <!-- Backdrop -->
+                      <label class="voucher-backdrop" for="voucherPreviewToggle" aria-label="Cerrar"></label>
+
+                      <!-- Modal -->
+                      <div class="voucher-modal" role="dialog" aria-modal="true">
+                        <div class="voucher-modal-inner">
+                          <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
+                            <div class="fw-semibold">Voucher (vista grande)</div>
+                            <label class="btn btn-sm btn-outline-secondary" for="voucherPreviewToggle">Cerrar</label>
+                          </div>
+
+                          <div class="voucher-stage">
+                            <img
+                              class="voucher-img-large"
+                              [src]="'https://harumi-otaku-backend-net.onrender.com' + d.voucherImagenUrl"
+                              alt="Voucher Yape (vista grande)"
+                            />
+                          </div>
+
+                          <div class="small text-muted mt-2">
+                            Tip: usa el zoom del navegador (Ctrl + / Ctrl -) si necesitas mas detalle.
+                          </div>
+                        </div>
+                      </div>
+                    </div> <!-- /voucher-preview -->
+                  </div>
+                </div>
+              </div> <!-- /row -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Cambiar estado -->
+        <div class="col-12">
+          <div class="card pedidos-subcard">
+            <div class="card-body">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+                <h4 class="h6 mb-0">Cambiar estado</h4>
+                <span class="text-muted small">No afecta la validacion del pago</span>
+              </div>
+
+              <form [formGroup]="formEstado" (ngSubmit)="cambiarEstado()" class="row g-3 align-items-end">
+                <div class="col-12 col-md-4">
+                  <label class="form-label">Estado</label>
+                  <select class="form-select" formControlName="estadoCodigo" [disabled]="!puedeEditarEstado">
+                    <option value="">-- Selecciona --</option>
+                    <option value="CREADA">CREADA</option>
+                    <option value="PENDIENTE">PENDIENTE</option>
+                    <option value="PREPARANDO">PREPARANDO</option>
+                    <option value="LISTO">LISTO</option>
+                    <option value="ENTREGADO">ENTREGADO</option>
+                    <option value="CANCELADA">CANCELADA</option>
+                  </select>
+
+                  <div
+                    *ngIf="formEstado.get('estadoCodigo')?.touched && formEstado.get('estadoCodigo')?.invalid"
+                    class="text-danger small mt-1"
+                  >
+                    Selecciona un estado.
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-5">
+                  <label class="form-label">Comentario</label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    formControlName="comentario"
+                    placeholder="Opcional"
+                    [disabled]="!puedeEditarEstado"
+                  />
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <button
+                    type="submit"
+                    class="btn btn-brand w-100"
+                    [disabled]="!selectedOrden || formEstado.invalid || isLoadingDetalle || !puedeEditarEstado"
+                  >
+                    Actualizar
+                  </button>
+                </div>
+              </form>
+
+              <div *ngIf="!puedeEditarEstado" class="alert alert-warning d-flex align-items-start gap-2 mt-3" role="alert">
+                <span class="alert-ico" aria-hidden="true">!</span>
+                <div class="flex-grow-1">
+                  <div class="small">No se puede cambiar el estado de una orden con pago rechazado.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="col-12">
+          <div class="card pedidos-subcard">
+            <div class="card-body">
+              <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                <h4 class="h6 mb-0">Historial de estados</h4>
+                <span class="text-muted small" *ngIf="isLoadingHistorial">Cargando...</span>
+              </div>
+
+              <div *ngIf="isLoadingHistorial" class="skeleton-wrap">
+                <div class="skeleton-row" *ngFor="let _ of [1,2,3,4]">
+                  <div class="skeleton-cell w-20"></div>
+                  <div class="skeleton-cell w-25"></div>
+                  <div class="skeleton-cell w-35"></div>
+                  <div class="skeleton-cell w-20"></div>
+                </div>
+              </div>
+
+              <div *ngIf="!isLoadingHistorial" class="table-responsive table-scroll table-scroll--inner">
+                <table class="table table-sm table-hover align-middle mb-0 pedidos-table table-sticky">
+                  <thead>
+                    <tr>
+                      <th class="text-nowrap">Fecha</th>
+                      <th class="text-nowrap">Estado</th>
+                      <th class="text-nowrap">Comentario</th>
+                      <th class="text-nowrap">Cambiado por</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let h of historial">
+                      <td class="text-nowrap">{{ h.fechaCambio | date:'yyyy-MM-dd HH:mm' }}</td>
+                      <td class="text-nowrap">
+                        <span class="badge text-bg-light text-dark me-2">{{ h.estadoCodigo }}</span>
+                        <span class="text-muted small">{{ h.estadoNombre }}</span>
+                      </td>
+                      <td class="hist-comment">{{ h.comentario }}</td>
+                      <td class="text-nowrap">{{ h.cambiadoPorUsuarioId }}</td>
+                    </tr>
+
+                    <tr *ngIf="historial.length === 0">
+                      <td colspan="4" class="text-center text-muted py-3">Sin historial.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div> <!-- /card-body -->
+          </div>
+        </div>
+      </div> <!-- /row -->
+    </div> <!-- /card-body -->
+  </section>
+
+  <!-- Empty state -->
+  <section class="card pedidos-card" *ngIf="!selectedOrden">
+    <div class="card-body">
+      <div class="empty-state">
+        <div class="empty-ico" aria-hidden="true">🍜</div>
+        <div class="fw-semibold">Selecciona una orden</div>
+        <div class="text-muted small">Usa "Ver detalle" para administrar pago, estado e historial.</div>
+      </div>
+    </div>
+  </section>
+</div>

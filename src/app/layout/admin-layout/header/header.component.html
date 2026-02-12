@@ -1,0 +1,120 @@
+<!-- src/app/layout/header/header.component.html -->
+<nav class="guru-header">
+
+
+
+<div class="guru-header-left">
+ 
+
+  <span class="guru-logo-text">
+<svg width="160" height="38" viewBox="0 0 160 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text x="2" y="28" font-family="Arial, Inter, sans-serif" font-size="24" font-weight="bold" fill="#fff">Otaku</text>
+<text x="75" y="28"
+      font-family="Arial, Inter, sans-serif"
+      font-size="24"
+      fill="#FFFFFF"
+      xml:space="preserve">
+   -Kpop
+</text>
+
+
+</svg>
+
+
+  </span>
+    <!--  -->
+<button class="guru-menu-btn" id="sidebarToggle" (click)="toggleSidebar()">
+  <span class="guru-menu-icon">
+    <!-- SVG hamburguesa -->
+    <svg width="32" height="32" viewBox="0 0 32 32">
+      <circle cx="16" cy="16" r="15" stroke="#fff" stroke-width="1.4" fill="none"/>
+      <rect x="10" y="13" width="12" height="2" rx="1" fill="#fff"/>
+      <rect x="10" y="17" width="12" height="2" rx="1" fill="#fff"/>
+      <rect x="10" y="21" width="12" height="2" rx="1" fill="#fff"/>
+    </svg>
+  </span>
+</button>
+
+</div>
+
+
+
+
+
+  <div class="guru-header-center">
+<!-- Ejemplo para Angular/TS: -->
+<li class="header-action">
+  <button class="fullscreen-btn" apptogglefullscreen (click)="toggleFullscreen()" aria-label="Pantalla completa">
+ <svg width="28" height="28" viewBox="0 0 28 28">
+  <g stroke="#23254d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Flecha superior izquierda -->
+    <line x1="7" y1="11" x2="7" y2="7"/>
+    <line x1="7" y1="7" x2="11" y2="7"/>
+    <line x1="7" y1="7" x2="12" y2="12"/>
+    <!-- Flecha superior derecha -->
+    <line x1="21" y1="11" x2="21" y2="7"/>
+    <line x1="21" y1="7" x2="17" y2="7"/>
+    <line x1="21" y1="7" x2="16" y2="12"/>
+    <!-- Flecha inferior izquierda -->
+    <line x1="7" y1="17" x2="7" y2="21"/>
+    <line x1="7" y1="21" x2="11" y2="21"/>
+    <line x1="7" y1="21" x2="12" y2="16"/>
+    <!-- Flecha inferior derecha -->
+    <line x1="21" y1="17" x2="21" y2="21"/>
+    <line x1="21" y1="21" x2="17" y2="21"/>
+    <line x1="21" y1="21" x2="16" y2="16"/>
+  </g>
+</svg>
+
+  </button>
+</li>
+
+  </div>
+  <div class="guru-header-right">
+
+
+
+
+   
+   <!-- Notificación campana con punto rosa -->
+
+
+<!-- Chat con punto verde -->
+<ul class="top" style="display: flex; gap: 56px;">
+  <!-- Campana (notificación) -->
+  <li class="header-notification">
+ 
+  </li>
+  <!-- Chat -->
+  <li class="header-notification">
+ 
+  </li>
+</ul>
+
+
+
+
+    <li class="guru-user" *ngIf="currentUser">
+      <a href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="images/referencial.png"  class="guru-user-img" />
+       <span class="guru-user-text">{{ currentUser.rol }}</span>
+      
+
+       <svg width="22" height="22" viewBox="0 0 22 22" class="guru-arrow-svg" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <polyline points="6 9 11 14 16 9" stroke="#23254d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+        <li class="dropdown-header text-center">
+          <strong>{{ currentUser.rol }}</strong><br>
+          <small class="text-muted">{{ currentUser.email }}</small>
+        </li>
+        <li><hr class="dropdown-divider" /></li>
+      
+        <li><hr class="dropdown-divider" /></li>
+        <li><a class="dropdown-item text-danger" (click)="logout()">Cerrar sesión</a></li>
+      </ul>
+    </li>
+  </div>
+</nav>

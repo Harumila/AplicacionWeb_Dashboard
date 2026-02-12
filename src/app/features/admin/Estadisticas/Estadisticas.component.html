@@ -1,0 +1,32 @@
+<div class="stats-wrapper">
+  <div *ngIf="loading" class="loading-container"><i class="fas fa-spinner fa-spin"></i> Cargando...</div>
+
+  <div [hidden]="loading || error">
+    <div class="summary-cards">
+       <div *ngFor="let card of summaryCards" class="card" [class]="'card-' + card.color">
+          <div class="card-icon"><i class="fas" [class]="card.icon"></i></div>
+          <div class="card-content">
+            <h3>{{ card.value }}</h3>
+            <p>{{ card.label }}</p>
+          </div>
+       </div>
+    </div>
+
+    <div class="stats-container">
+      <div class="dashboard-grid">
+        <div class="chart-container full-width">
+          <h3>💰 Flujo de Ventas</h3>
+          <div class="chart-wrapper"><canvas #ventasChart></canvas></div>
+        </div>
+        <div class="chart-container">
+          <h3>🍱 Top Productos</h3>
+          <div class="chart-wrapper"><canvas #platillosChart></canvas></div>
+        </div>
+        <div class="chart-container">
+          <h3>🧋 Operaciones</h3>
+          <div class="chart-wrapper"><canvas #bubbleteaChart></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

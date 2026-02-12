@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h5 class="modal-title">{{ title }}</h5>
+  <button type="button" class="btn-close" (click)="dismiss()" aria-label="Close"></button>
+</div>
+
+<div class="modal-body">
+  <!-- Usar [innerHTML] para renderizar HTML -->
+  <p [innerHTML]="message"></p>
+  
+  <!-- Mensaje adicional si existe -->
+  <div *ngIf="additionalMessage" [innerHTML]="additionalMessage" class="mt-2"></div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-secondary" (click)="dismiss()">
+    {{ cancelButtonText }}
+  </button>
+  <button type="button" [class]="'btn ' + confirmButtonClass" (click)="confirm()">
+    {{ confirmButtonText }}
+  </button>
+</div>
+  
