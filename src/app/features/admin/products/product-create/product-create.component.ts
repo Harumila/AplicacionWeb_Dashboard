@@ -32,11 +32,13 @@ export class ProductCreateComponent implements OnInit {
     private categoriaService: CategoriaServices,
     private router: Router
   ) {
+    // Definición de validaciones estrictas
     this.productoForm = this.fb.group({
       categoriaId: [null, [Validators.required]],
-      nombre: ['', [Validators.required, Validators.maxLength(255)]],
+      nombre: ['', [Validators.required, Validators.maxLength(255), Validators.minLength(2)]],
       descripcion: ['', [Validators.maxLength(1000)]],
-      precio: [0, [Validators.required, Validators.min(0.01)]],
+      // No vacío, mínimo 0.01 y máximo 5000
+      precio: [null, [Validators.required, Validators.min(0.01), Validators.max(5000)]],
       activo: [true, [Validators.required]],
     });
   }
@@ -51,11 +53,6 @@ export class ProductCreateComponent implements OnInit {
       next: (data) => {
         this.categorias = data ?? [];
         this.loadingCategorias = false;
-
-        // opcional: si quieres auto-seleccionar la primera
-        // if (!this.productoForm.value.categoriaId && this.categorias.length > 0) {
-        //   this.productoForm.patchValue({ categoriaId: this.categorias[0].id });
-        // }
       },
       error: () => {
         this.loadingCategorias = false;
@@ -69,7 +66,10 @@ export class ProductCreateComponent implements OnInit {
     const file = input.files?.[0] ?? null;
 
     this.fotoFile = file;
-    if (!file) { this.fotoPreview = null; return; }
+    if (!file) {
+      this.fotoPreview = null;
+      return;
+    }
 
     const reader = new FileReader();
     reader.onload = () => (this.fotoPreview = String(reader.result));
@@ -80,13 +80,18 @@ export class ProductCreateComponent implements OnInit {
     this.mensajeError = null;
     this.mensajeExito = null;
 
+    // Marcamos todos como tocados para activar las alertas visuales en el HTML
+    this.productoForm.markAllAsTouched();
+
+    // Validar si el formulario es inválido o tiene campos vacíos
     if (this.productoForm.invalid) {
-      this.productoForm.markAllAsTouched();
-      this.mensajeError = 'Completa los campos requeridos.';
+      this.mensajeError = 'Por favor, completa correctamente los campos obligatorios.';
       return;
     }
+
+    // Validar que la foto no sea nula (campo independiente del formGroup)
     if (!this.fotoFile) {
-      this.mensajeError = 'Selecciona una foto del producto.';
+      this.mensajeError = 'Debes seleccionar una foto para el producto.';
       return;
     }
 
@@ -95,8 +100,9 @@ export class ProductCreateComponent implements OnInit {
 
     const fd = new FormData();
     fd.append('CategoriaId', String(v.categoriaId));
-    fd.append('Nombre', String(v.nombre));
-    fd.append('Descripcion', String(v.descripcion ?? ''));
+    // .trim() evita que envíen solo espacios en blanco
+    fd.append('Nombre', String(v.nombre).trim());
+    fd.append('Descripcion', String(v.descripcion ?? '').trim());
     fd.append('Precio', String(v.precio));
     fd.append('Activo', String(v.activo));
     fd.append('Foto', this.fotoFile);
@@ -105,11 +111,12 @@ export class ProductCreateComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.mensajeExito = 'Producto creado correctamente';
-        setTimeout(() => this.router.navigate(['/admin/mantenimiento/producto']), 800);
+        // Redirección corta para que el usuario vea el mensaje de éxito
+        setTimeout(() => this.router.navigate(['/admin/mantenimiento/producto']), 1200);
       },
       error: (err) => {
         this.isLoading = false;
-        this.mensajeError = err?.error?.message ?? 'Error al crear producto';
+        this.mensajeError = err?.error?.message ?? 'Error al conectar con el servidor';
       },
     });
   }
