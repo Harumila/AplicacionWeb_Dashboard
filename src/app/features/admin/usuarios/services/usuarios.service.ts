@@ -15,7 +15,7 @@ export interface AdminAccount {
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
   // Ajusta el puerto (5295) según lo que veas en tu laptop MSI
-  private apiUrl = 'http://localhost:5295/api/auth'; 
+  private apiUrl = 'https://harumi-otaku-backend-net.onrender.com';
 
   constructor(private http: HttpClient) {}
 
