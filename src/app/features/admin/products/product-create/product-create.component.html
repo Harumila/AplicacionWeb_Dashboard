@@ -13,10 +13,9 @@
 
         <div class="mb-4">
           <h1 class="fw-bold mb-1">Crear Nuevo Producto</h1>
-          <p class="text-muted m-0">Completa la información del producto</p>
+          <p class="text-muted m-0">Completa la información del producto para la textil</p>
         </div>
 
-        <!-- error normal -->
         <div class="alert alert-danger mb-4" *ngIf="mensajeError">
           <i class="fas fa-exclamation-triangle me-2"></i>
           {{ mensajeError }}
@@ -28,78 +27,79 @@
             <form [formGroup]="productoForm" (ngSubmit)="submit()">
 
               <div class="row g-3">
-               <!-- CategoriaId -->
-<div class="col-md-6">
-  <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                <div class="col-md-6">
+                  <label class="form-label">Categoría <span class="text-danger">*</span></label>
+                  <select class="form-select" formControlName="categoriaId"
+                          [class.is-invalid]="productoForm.get('categoriaId')?.touched && productoForm.get('categoriaId')?.invalid">
+                    <option [ngValue]="null" disabled>
+                      {{ loadingCategorias ? 'Cargando...' : 'Selecciona una categoría' }}
+                    </option>
+                    <option *ngFor="let c of categorias" [ngValue]="c.id">{{ c.nombre }}</option>
+                  </select>
+                  <div class="invalid-feedback" *ngIf="productoForm.get('categoriaId')?.touched && productoForm.get('categoriaId')?.invalid">
+                    La categoría es obligatoria.
+                  </div>
+                </div>
 
-  <select class="form-control" formControlName="categoriaId" [disabled]="loadingCategorias">
-    <option [ngValue]="null" disabled>
-      {{ loadingCategorias ? 'Cargando categorías...' : 'Selecciona una categoría' }}
-    </option>
-
-    <option *ngFor="let c of categorias" [ngValue]="c.id">
-      {{ c.nombre }}
-    </option>
-  </select>
-
-  <div class="text-danger small mt-1"
-       *ngIf="productoForm.get('categoriaId')?.touched && productoForm.get('categoriaId')?.invalid">
-    Categoría requerida
-  </div>
-</div>
-
-                <!-- Activo -->
                 <div class="col-md-6">
                   <label class="form-label">Activo</label>
-                  <select class="form-control" formControlName="activo">
+                  <select class="form-select" formControlName="activo">
                     <option [ngValue]="true">Sí</option>
                     <option [ngValue]="false">No</option>
                   </select>
                 </div>
 
-                <!-- Nombre -->
                 <div class="col-12">
                   <label class="form-label">Nombre <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" formControlName="nombre" placeholder="Nombre del producto">
-                  <div class="text-danger small mt-1" *ngIf="productoForm.get('nombre')?.touched && productoForm.get('nombre')?.invalid">
-                    Nombre requerido
+                  <input type="text" class="form-control" formControlName="nombre"
+                         [class.is-invalid]="productoForm.get('nombre')?.touched && productoForm.get('nombre')?.invalid"
+                         placeholder="Nombre del producto">
+                  <div class="invalid-feedback" *ngIf="productoForm.get('nombre')?.touched && productoForm.get('nombre')?.invalid">
+                    El nombre es obligatorio (mín. 3 caracteres).
                   </div>
                 </div>
 
-                <!-- Descripcion -->
                 <div class="col-12">
                   <label class="form-label">Descripción</label>
-                  <textarea rows="3" class="form-control" formControlName="descripcion" placeholder="Descripción"></textarea>
+                  <textarea rows="2" class="form-control" formControlName="descripcion" placeholder="Opcional..."></textarea>
                 </div>
 
-                <!-- Precio -->
                 <div class="col-md-6">
                   <label class="form-label">Precio <span class="text-danger">*</span></label>
-                  <div class="input-group">
+                  <div class="input-group has-validation">
                     <span class="input-group-text">S/</span>
-                    <input type="number" class="form-control" formControlName="precio" step="0.01" placeholder="0.00">
+                    <input type="number" class="form-control" formControlName="precio"
+                           [class.is-invalid]="productoForm.get('precio')?.touched && productoForm.get('precio')?.invalid"
+                           placeholder="0.00">
+                    <div class="invalid-feedback" *ngIf="productoForm.get('precio')?.touched && productoForm.get('precio')?.invalid">
+                      <span *ngIf="productoForm.get('precio')?.errors?.['required']">El precio es obligatorio.</span>
+                      <span *ngIf="productoForm.get('precio')?.errors?.['min']">Debe ser mayor a 0.</span>
+                      <span *ngIf="productoForm.get('precio')?.errors?.['max']">El máximo es S/ 100,00.</span>
+                    </div>
                   </div>
                 </div>
 
-                <!-- Foto -->
                 <div class="col-md-6">
                   <label class="form-label">Foto <span class="text-danger">*</span></label>
-                  <input type="file" class="form-control" (change)="onFotoSelected($event)" accept="image/*">
+                  <input type="file" class="form-control"
+                         [class.is-invalid]="productoForm.get('nombre')?.touched && !fotoFile"
+                         (change)="onFotoSelected($event)" accept="image/*">
+                  <div class="text-danger small mt-1" *ngIf="productoForm.get('nombre')?.touched && !fotoFile">
+                    La foto es obligatoria.
+                  </div>
 
-                  <div *ngIf="fotoPreview" class="mt-2">
-                    <img [src]="fotoPreview" class="img-thumbnail" style="max-height: 150px;">
-                    <small class="d-block text-muted">Nueva imagen seleccionada</small>
+                  <div *ngIf="fotoPreview" class="mt-2 text-center">
+                    <img [src]="fotoPreview" class="img-thumbnail" style="max-height: 120px;">
                   </div>
                 </div>
               </div>
 
               <div class="d-flex justify-content-end gap-2 mt-4">
-                <button type="button" class="btn btn-outline-secondary" [disabled]="isLoading"
-                        (click)="cancel()">
+                <button type="button" class="btn btn-outline-secondary" [disabled]="isLoading" (click)="cancel()">
                   Cancelar
                 </button>
-
                 <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
                   {{ isLoading ? 'Guardando...' : 'Crear Producto' }}
                 </button>
               </div>
